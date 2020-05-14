@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 import requests
 
@@ -29,6 +30,11 @@ class CodiMDClient:
         if 400 <= res.status_code < 500:
             raise Exception(f"login failed with status {res.status_code}.")
 
+    def export_data(self) -> bytes:
+        res = self._get("/me/export")
+        return res.content
+
+
 
 CODIMD_BASEURL = os.getenv("CODIMD_BASEURL")
 CODIMD_EMAIL = os.getenv("CODIMD_EMAIL")
@@ -41,3 +47,5 @@ if CODIMD_DEBUG:
 
 cli = CodiMDClient(CODIMD_BASEURL, CODIMD_EMAIL, CODIMD_PASSWORD)
 
+res = cli.export_data()
+sys.stdout.buffer.write(res)
