@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+[ "${CODIMD_DEBUG}" != "" ] && set -ex
 
 git config --global user.email "${CODIMD_EMAIL}"
 git config --global user.name "${CODIMD_NAME}"
