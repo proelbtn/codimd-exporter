@@ -22,6 +22,6 @@ unzip /tmp/archive.zip -d /var/run/codimd-exporter/repo
 cd /var/run/codimd-exporter/repo
 if [ "$(git status -s)" != "" ]; then
   git add .
-  git commit -m "test"
+  git commit -m "updated"
   git push origin ${CODIMD_BRANCH}
 fi
