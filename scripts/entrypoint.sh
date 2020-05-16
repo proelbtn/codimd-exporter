@@ -5,8 +5,6 @@
 git config --global user.email "${CODIMD_EMAIL}"
 git config --global user.name "${CODIMD_NAME}"
 
-ssh-keyscan github.com > /root/.ssh/known_hosts
-
 if [ ! -d /var/run/codimd-exporter/repo ]; then
   git clone ${CODIMD_REPOSITORY} /var/run/codimd-exporter/repo
 else
