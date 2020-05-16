@@ -3,6 +3,7 @@ import os
 import sys
 
 import requests
+from bs4 import BeautifulSoup
 
 
 
@@ -26,12 +27,32 @@ class CodiMDClient:
         self.sess = requests.Session()
         self.baseurl = baseurl
 
-        res = self._post("/login", data={"email": email, "password": password})
-        if 400 <= res.status_code < 500:
-            raise Exception(f"login failed with status {res.status_code}.")
+        if self.baseurl == "https://hackmd.io":
+            res = self._get("/login")
+            if 400 <= res.status_code < 500:
+                raise Exception(f"fetch csrf token failed with status {res.status_code}.")
+
+            soup = BeautifulSoup(res.content, features="lxml")
+            csrf_token = soup.select("head > meta[name=csrf-token]")[0]["content"]
+
+            res = self._post("/login", data={"email": email, "password": password, "_csrf": csrf_token})
+            if 400 <= res.status_code < 500:
+                raise Exception(f"login failed with status {res.status_code}.")
+            if "Forgot password" in res.content.decode():
+                raise Exception(f"login failed.")
+        else:
+            res = self._post("/login", data={"email": email, "password": password})
+            if 400 <= res.status_code < 500:
+                raise Exception(f"login failed with status {res.status_code}.")
+
 
     def export_data(self) -> bytes:
-        res = self._get("/me/export")
+        if self.baseurl == "https://hackmd.io":
+            endpoint = "/exportAllNotes"
+        else:
+            endpoint = "/me/export"
+
+        res = self._get(endpoint)
         return res.content
 
 
